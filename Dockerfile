@@ -27,13 +27,20 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install production dependencies only
+# Copy package files
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
 
-# Copy Prisma schema and generated client
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+# Copy Prisma schema (needed for Prisma Client)
 COPY --from=builder /app/prisma ./prisma
+
+# Install production dependencies
+# Prisma is now in dependencies, so it will be installed
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
+
+# Copy Prisma generated client from builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Copy built application
 COPY --from=builder /app/dist ./dist
 
 # Create data directory for uploads and SQLite

@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model CapturedRequest {
+  id              String   @id
+  ts              DateTime @default(now())
+  ip              String?
+  method          String
+  path            String
+  query           Json
+  headers         Json
+  contentType     String?  @map("content_type")
+  contentLength   Int?     @map("content_length")
+  rawBodyBytes    Bytes?   @map("raw_body_bytes")
+  rawBodyEncoding String?  @map("raw_body_encoding")
+  truncated       Boolean  @default(false)
+  hasFiles        Boolean  @default(false) @map("has_files")
+  deletedAt       DateTime? @map("deleted_at")
+
+  files UploadedFile[]
+
+  @@index([ts, path])
+  @@index([path, method, ts(sort: Desc)])
+  @@map("captured_requests")
+}
+
+model UploadedFile {
+  id          String   @id
+  requestId  String   @map("request_id")
+  fieldName  String   @map("field_name")
+  originalName String @map("original_name")
+  mimeType   String?  @map("mime_type")
+  size       Int
+  diskPath   String   @map("disk_path")
+
+  request CapturedRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@map("uploaded_files")
+}
+

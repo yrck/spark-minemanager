@@ -14,6 +14,7 @@ COPY prisma ./prisma/
 RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Generate Prisma Client
+ENV DATABASE_URL="file:./dev.db"
 RUN npx prisma generate
 
 # Copy source code

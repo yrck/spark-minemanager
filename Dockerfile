@@ -10,7 +10,8 @@ COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
 
 # Install dependencies
-RUN npm ci
+# Use npm install if lockfile doesn't exist, otherwise use npm ci for faster, reliable builds
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Generate Prisma Client
 RUN npx prisma generate

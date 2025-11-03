@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.12",
-    "@types/ulid": "^2.3.5",
     "tsx": "^4.16.2",
     "typescript": "^5.5.4",
     "vitest": "^1.6.0",

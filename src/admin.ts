@@ -121,7 +121,7 @@ export async function registerAdminRoutes(
     ]);
 
     // Parse JSON strings back to objects
-    const parsedRequests = requests.map((req) => ({
+    const parsedRequests = requests.map((req: typeof requests[0]) => ({
       ...req,
       query: req.query ? JSON.parse(req.query) : {},
       headers: req.headers ? JSON.parse(req.headers) : {},

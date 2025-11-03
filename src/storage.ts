@@ -49,10 +49,22 @@ export async function saveMultipartFiles(
         diskPath,
       });
     } else {
-      // Non-file field - use toBuffer() method
-      const valueBuffer = await part.toBuffer();
-      const value = valueBuffer.toString('utf8');
-      fields[part.fieldname] = value;
+      // Non-file field - Fastify multipart fields can be read directly
+      // Check if it has a value property (for simple fields) or needs to be streamed
+      if ('value' in part && typeof (part as any).value === 'string') {
+        fields[part.fieldname] = (part as any).value;
+      } else {
+        // Read as stream
+        const chunks: Buffer[] = [];
+        const partAny = part as any;
+        if (partAny[Symbol.asyncIterator]) {
+          for await (const chunk of partAny) {
+            chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+          }
+        }
+        const value = chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : '';
+        fields[part.fieldname] = value;
+      }
     }
   }
 

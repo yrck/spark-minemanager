@@ -65,7 +65,7 @@ export async function registerHealthRoutes(
   fastify.get('/readyz', async (_request: FastifyRequest, reply: FastifyReply) => {
     try {
       // Verify DB is writable by attempting a transaction
-      await prisma.$transaction(async (tx) => {
+      await prisma.$transaction(async (tx: any) => {
         // Try to create a test record (we'll roll it back)
         const testId = `test-${Date.now()}`;
         await tx.capturedRequest.create({

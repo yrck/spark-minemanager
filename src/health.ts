@@ -73,8 +73,8 @@ export async function registerHealthRoutes(
             id: testId,
             method: 'TEST',
             path: '/test',
-            query: {},
-            headers: {},
+            query: JSON.stringify({}),
+            headers: JSON.stringify({}),
           },
         });
         await tx.capturedRequest.delete({

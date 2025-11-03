@@ -35,12 +35,8 @@ export async function saveMultipartFiles(
       const filename = file.filename || `file-${fileId}`;
       const diskPath = join(requestDir, filename);
 
-      // Save file to disk
-      const chunks: Buffer[] = [];
-      for await (const chunk of file) {
-        chunks.push(chunk);
-      }
-      const fileBuffer = Buffer.concat(chunks);
+      // Save file to disk using toBuffer() method
+      const fileBuffer = await file.toBuffer();
       await fs.writeFile(diskPath, fileBuffer);
 
       files.push({
@@ -48,17 +44,14 @@ export async function saveMultipartFiles(
         requestId,
         fieldName: part.fieldname,
         originalName: filename,
-        mimeType: file.mimetype || undefined,
+        mimeType: file.mimetype || null,
         size: fileBuffer.length,
         diskPath,
       });
     } else {
-      // Non-file field
-      const chunks: Buffer[] = [];
-      for await (const chunk of part) {
-        chunks.push(chunk);
-      }
-      const value = Buffer.concat(chunks).toString('utf8');
+      // Non-file field - use toBuffer() method
+      const valueBuffer = await part.toBuffer();
+      const value = valueBuffer.toString('utf8');
       fields[part.fieldname] = value;
     }
   }

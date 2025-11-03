@@ -20,7 +20,7 @@ export interface UploadedFileData {
   requestId: string;
   fieldName: string;
   originalName: string;
-  mimeType?: string;
+  mimeType: string | null;
   size: number;
   diskPath: string;
 }

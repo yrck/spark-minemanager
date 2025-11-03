@@ -16,8 +16,8 @@ model CapturedRequest {
   ip              String?
   method          String
   path            String
-  query           Json
-  headers         Json
+  query           String   @default("{}") // JSON stored as string for SQLite compatibility
+  headers         String   @default("{}") // JSON stored as string for SQLite compatibility
   contentType     String?  @map("content_type")
   contentLength   Int?     @map("content_length")
   rawBodyBytes    Bytes?   @map("raw_body_bytes")

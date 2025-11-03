@@ -120,8 +120,15 @@ export async function registerAdminRoutes(
       prisma.capturedRequest.count({ where }),
     ]);
 
+    // Parse JSON strings back to objects
+    const parsedRequests = requests.map((req) => ({
+      ...req,
+      query: req.query ? JSON.parse(req.query) : {},
+      headers: req.headers ? JSON.parse(req.headers) : {},
+    }));
+
     return reply.status(200).send({
-      requests,
+      requests: parsedRequests,
       pagination: {
         limit: limitNum,
         offset: offsetNum,
@@ -161,11 +168,16 @@ export async function registerAdminRoutes(
       }
     }
 
-    return reply.status(200).send({
+    // Parse JSON strings back to objects
+    const parsedRequest = {
       ...requestRecord,
+      query: requestRecord.query ? JSON.parse(requestRecord.query) : {},
+      headers: requestRecord.headers ? JSON.parse(requestRecord.headers) : {},
       rawBodyBytes: undefined, // Don't send binary directly
       body,
-    });
+    };
+
+    return reply.status(200).send(parsedRequest);
   });
 
   // List files for a request

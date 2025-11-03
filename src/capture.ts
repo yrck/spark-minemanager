@@ -100,14 +100,15 @@ export async function registerCaptureRoute(fastify: FastifyInstance, prisma: Pri
       }
 
       // Create database records
+      // Stringify JSON fields for SQLite compatibility
       const capturedRequest = await prisma.capturedRequest.create({
         data: {
           id: requestId,
           ip,
           method,
           path,
-          query: query as Record<string, unknown>,
-          headers: headers as Record<string, unknown>,
+          query: JSON.stringify(query),
+          headers: JSON.stringify(headers),
           contentType,
           contentLength,
           rawBodyBytes: rawBodyBytes || undefined,

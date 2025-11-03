@@ -5,8 +5,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    # Note: Port mapping removed for Coolify compatibility
+    # Coolify manages port bindings automatically
+    # For local dev, add: ports: - "3000:3000"
     environment:
       - PORT=3000
       - NODE_ENV=development

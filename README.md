@@ -111,6 +111,19 @@ The server will start on `http://localhost:3000`.
 
 ### Using Docker Compose
 
+**Note**: The `docker-compose.yaml` file is configured for Coolify deployment (no port bindings). For local development, you can either:
+
+1. **Add port mapping manually**:
+   ```bash
+   docker-compose up --build -p 3000:3000
+   ```
+
+2. **Or modify docker-compose.yaml** temporarily to add:
+   ```yaml
+   ports:
+     - "3000:3000"
+   ```
+
 ```bash
 # Build and start
 docker-compose up --build
@@ -144,29 +157,31 @@ docker run -p 3000:3000 \
 
 ### Configuration
 
-1. **Port**: Container listens on port `3000`
-2. **Volume Mounts**:
+1. **Port**: Container listens on port `3000` internally (Coolify handles external port mapping)
+2. **Volume Mounts**: Configure in Coolify UI:
    - `/data` - For SQLite database and uploads (or use external Postgres)
    - `/data/uploads` - For uploaded files
 
-3. **Environment Variables**: Set all required variables in Coolify
+3. **Environment Variables**: Set all required variables in Coolify UI
 
 4. **Health Check**: The container includes a healthcheck for `/healthz`
 
 ### Deployment Steps
 
 1. Connect your repository to Coolify
-2. Set environment variables:
-   - `DATABASE_URL` (Postgres connection string for production)
+2. **Important**: Coolify will use the Dockerfile - it will generate its own docker-compose.yaml
+3. Set environment variables in Coolify UI:
+   - `DATABASE_URL` (Postgres connection string for production, or SQLite path)
    - `ADMIN_TOKEN` (strong, random token)
    - `NODE_ENV=production`
-   - `PORT=3000`
+   - `PORT=3000` (container internal port)
    - `UPLOAD_DIR=/data/uploads`
-3. Coolify will:
-   - Build the Docker image
-   - Run Prisma migrations on startup
-   - Start the service on port 3000
-   - Handle HTTPS termination and domain routing
+4. Configure volumes in Coolify for persistent data storage
+5. Coolify will:
+   - Build the Docker image using the Dockerfile
+   - Run Prisma migrations on startup (via CMD)
+   - Start the service on port 3000 inside container
+   - Handle HTTPS termination and domain routing automatically
 
 ### Database Migration
 

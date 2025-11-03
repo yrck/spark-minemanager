@@ -14,7 +14,6 @@ tests
 scripts
 *.test.ts
 *.spec.ts
-tsconfig.json
 package-lock.json
 yarn.lock
 pnpm-lock.yaml

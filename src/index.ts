@@ -22,19 +22,8 @@ async function main() {
   // Ensure upload directory exists
   await ensureUploadDir(env.UPLOAD_DIR);
 
-  // Run Prisma migrations
-  try {
-    logger.info('Running Prisma migrations...');
-    // For production, use migrate deploy; for dev, migrations are handled separately
-    // We'll use a simple check here - in production, migrations should be run before startup
-    if (env.NODE_ENV === 'production') {
-      // Migrations should be run via docker command or startup script
-      logger.info('Skipping migrations in production (should be run separately)');
-    }
-  } catch (error) {
-    logger.error({ error }, 'Failed to run migrations');
-    throw error;
-  }
+  // Note: Migrations are run in Dockerfile CMD before starting the server
+  // No need to run them here
 
   // Create Fastify instance
   const fastify = Fastify({
@@ -97,7 +86,13 @@ async function main() {
 }
 
 main().catch((error) => {
-  logger.error({ error }, 'Fatal error');
+  logger.error({ 
+    error: error instanceof Error ? {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    } : error 
+  }, 'Fatal error');
   process.exit(1);
 });
 

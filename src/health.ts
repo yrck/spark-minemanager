@@ -36,10 +36,22 @@ export async function registerHealthRoutes(
   fastify: FastifyInstance,
   prisma: PrismaClient
 ): Promise<void> {
-  // Read version from package.json (using require for CommonJS compatibility)
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const packageJson = require('../../package.json');
-  const version = packageJson.version || '1.0.0';
+  // Read version from package.json
+  // Use process.cwd() to find package.json from the project root
+  let version = '1.0.0';
+  try {
+    const path = require('path');
+    const fs = require('fs');
+    const packageJsonPath = path.join(process.cwd(), 'package.json');
+    if (fs.existsSync(packageJsonPath)) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const packageJson = require(packageJsonPath);
+      version = packageJson.version || '1.0.0';
+    }
+  } catch {
+    // Fallback to default version if package.json can't be read
+    version = '1.0.0';
+  }
 
   // Health check endpoint
   fastify.get('/healthz', async (_request: FastifyRequest, reply: FastifyReply) => {
